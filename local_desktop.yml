@@ -2,6 +2,7 @@
   connection: local
   roles:
   - developer_profile
+  - java_oracle
 
   tasks:
   - yum: pkg=firewalld state=present

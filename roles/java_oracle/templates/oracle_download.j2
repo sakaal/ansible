@@ -1,0 +1,15 @@
+#!/bin/bash
+CWD="$(pwd)"
+cd {{ java_oracle_localdir }}
+CHECKSUM_FILE=/tmp/java_oracle_checksums
+FILENAME={{ java_oracle_archive }}
+trap "{ rm -f $CHECKSUM_FILE ; cd "$CWD"; }" EXIT
+if [ ! -f {{ java_oracle_archive }} ]; then
+    wget -nv --no-cookies --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com"\
+    http://download.oracle.com/otn-pub/java/{{ java_oracle_dirpath }}/$FILENAME -O $FILENAME
+fi
+cat > $CHECKSUM_FILE << EOF
+f16709533fff0eb5c8fb50273c662337df0aff29  jdk-7u45-linux-x64.rpm
+10a98c41a7ba8f66e5303ef6f80c5e2f8e1d8468  java_ee_sdk-7-jdk7-linux-x64.sh
+EOF
+sha1sum -c $CHECKSUM_FILE

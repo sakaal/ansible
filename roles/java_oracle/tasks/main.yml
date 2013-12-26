@@ -1,0 +1,18 @@
+- name: Prepare Oracle Java download script
+  template: src=oracle_download.j2 dest={{ java_oracle_localdir }}/oracle_download.sh mode=0555
+
+- name: Download Oracle Java
+  command: "{{ java_oracle_localdir }}/oracle_download.sh creates={{ java_oracle_localdir }}/{{ java_oracle_archive }}"
+  register: java_oracle_downloaded
+
+- name: Install the Oracle Java RPM
+  command: chdir={{ java_oracle_localdir }} rpm -U {{ java_oracle_archive }} creates="{{ java_oracle_home }}"
+  register: java_oracle_installed
+
+- name: Set Oracle java as default
+  command: alternatives --set java "{{ java_oracle_home }}/bin/java"
+  when: java_oracle_installed.changed
+
+- name: Set Oracle jar as default
+  command: alternatives --set jar "{{ java_oracle_home }}/bin/jar"
+  when: java_oracle_installed.changed
