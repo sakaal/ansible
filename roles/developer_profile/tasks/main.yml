@@ -1,0 +1,2 @@
+- user: name={{ profile_username }} comment="{{ profile_fullname }}" append=yes groups=wheel shell=/bin/bash generate_ssh_key=yes ssh_key_comment={{ profile_username }}@{{ ansible_fqdn }}-{{ ansible_date_time.iso8601 }} state=present
+- template: src=gitconfig.j2 dest=/home/{{ profile_username }}/.gitconfig owner={{ profile_username }} group={{ profile_username }} mode=0664
