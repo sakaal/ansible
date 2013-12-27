@@ -1,0 +1,17 @@
+- name: Prepare Eclipse download script
+  template: src=eclipse_download.j2 dest={{ eclipse_localdir }}/eclipse_download.sh mode=0555
+
+- name: Download Eclipse
+  command: "{{ eclipse_localdir }}/eclipse_download.sh creates={{ eclipse_localdir }}/{{ eclipse_archive }}"
+
+- name: Extract Eclipse
+  command: chdir="{{ eclipse_localdir }}" tar -xvf "{{ eclipse_archive }}" creates="eclipse"
+
+- file: path="{{ eclipse_localdir }}/eclipse" recurse=yes state=directory owner=root group=root
+
+- name: Create Eclipse desktop launcher icon
+  template: src=eclipse.desktop.j2 dest=/usr/share/applications/eclipse.desktop
+
+# TODO: Install Eclipse feature groups
+# sudo ./eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/webtools/repository/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jst.enterprise_ui.feature.feature.group,org.eclipse.jst.web_ui.feature.feature.group,org.eclipse.wst.web_ui.feature.feature.group,org.eclipse.wst.xml_ui.feature.feature.group,org.eclipse.jpt.common.feature.feature.group,org.eclipse.jpt.common.eclipselink.feature.feature.group,org.eclipse.jpt.jpa.eclipselink.feature.feature.group,org.eclipse.jpt.jaxb.eclipselink.feature.feature.group,org.eclipse.wst.common.fproj.feature.group,org.eclipse.jgit.pgm.feature.group,org.eclipse.egit.feature.group,org.eclipse.jgit.feature.group,org.eclipse.jgit.java7.feature.group,org.eclipse.mylyn.git.feature.group,org.eclipse.mylyn.github.feature.feature.group,org.eclipse.m2e.feature.feature.group,org.sonatype.m2e.mavenarchiver.feature.feature.group,org.eclipse.m2e.wtp.jaxrs.feature.feature.group,org.eclipse.m2e.wtp.jpa.feature.feature.group,org.eclipse.m2e.wtp.jsf.feature.feature.group,org.eclipse.m2e.wtp.feature.feature.group,org.eclipse.wst.server_adapters.feature.feature.group,org.eclipse.jst.enterprise_ui.feature.patch.feature.group
+# Start Eclipse with sudo to update it.

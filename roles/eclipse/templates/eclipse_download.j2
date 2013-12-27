@@ -1,0 +1,13 @@
+#!/bin/bash
+CWD="$(pwd)"
+cd {{ eclipse_localdir }}
+CHECKSUM_FILE=/tmp/eclipse_checksums
+FILENAME={{ eclipse_archive }}
+trap "{ rm -f $CHECKSUM_FILE ; cd "$CWD"; }" EXIT
+if [ ! -f {{ eclipse_archive }} ]; then
+    wget -nv http://download.eclipse.org/technology/epp/downloads/release/{{ eclipse_dirpath }}/$FILENAME -O $FILENAME
+fi
+cat > $CHECKSUM_FILE << EOF
+801234dd0187899e6e2e49a85842d5c75afa2a7d  eclipse-jee-kepler-SR1-linux-gtk-x86_64.tar.gz
+EOF
+sha1sum -c $CHECKSUM_FILE

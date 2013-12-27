@@ -3,6 +3,7 @@
   roles:
   - developer_profile
   - java_oracle
+  - eclipse
 
   tasks:
   - yum: pkg=firewalld state=present
@@ -12,6 +13,7 @@
   - yum: pkg=libselinux-python state=present
   - yum: pkg=lftp state=present
   - yum: pkg=man state=present
+  - yum: pkg=maven state=present
   - yum: pkg=nano state=present
   - yum: pkg=postgresql state=present
   - yum: pkg=python-boto state=present
