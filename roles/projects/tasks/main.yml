@@ -1,0 +1,4 @@
+- file: path="{{ pro_workspace }}" state=directory
+
+- git: repo="{{ pro_repos }}/{{ item }}.git" dest="{{ pro_workspace }}/{{ item }}"
+  with_items: pro_modules

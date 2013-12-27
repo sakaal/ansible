@@ -6,3 +6,8 @@ java_oracle_dirpath: jdk/7u45-b18
 java_oracle_archive: jdk-7u45-linux-x64.rpm
 java_oracle_localdir: /opt
 java_oracle_home: /usr/java/jdk1.7.0_45
+
+pro_workspace: /home/jdoe/workspace
+pro_repos: git@github.com:sakaal
+pro_modules:
+    - ansible

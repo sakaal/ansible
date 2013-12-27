@@ -13,7 +13,8 @@ As `root` on the newly installed machine:
 
 Edit `host_vars/localhost` with your profile details. Then run:
 
-    ansible-playbook local_desktop.yml -i local
+    sudo ansible-playbook local_desktop.yml -i local
+    ansible-playbook local_projects.yml -i local
 
 These are incomplete examples just to help you get started with Ansible.
 
