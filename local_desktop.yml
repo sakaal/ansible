@@ -3,7 +3,6 @@
   roles:
   - developer_profile
   - java_oracle
-  - eclipse
 
   tasks:
   - yum: pkg=firewalld state=present

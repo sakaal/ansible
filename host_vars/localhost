@@ -9,7 +9,8 @@ java_oracle_home: /usr/java/jdk1.7.0_45
 
 eclipse_dirpath: kepler/SR1
 eclipse_archive: eclipse-jee-kepler-SR1-linux-gtk-x86_64.tar.gz
-eclipse_localdir: /opt
+eclipse_owner: jdoe
+eclipse_localdir: /home/jdoe
 eclipse_release: Kepler
 
 pro_workspace: /home/jdoe/workspace
