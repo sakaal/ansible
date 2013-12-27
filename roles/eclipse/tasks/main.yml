@@ -13,5 +13,24 @@
   template: src=eclipse.desktop.j2 dest=/usr/share/applications/eclipse.desktop
 
 # TODO: Install Eclipse feature groups
-# sudo ./eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/webtools/repository/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jst.enterprise_ui.feature.feature.group,org.eclipse.jst.web_ui.feature.feature.group,org.eclipse.wst.web_ui.feature.feature.group,org.eclipse.wst.xml_ui.feature.feature.group,org.eclipse.jpt.common.feature.feature.group,org.eclipse.jpt.common.eclipselink.feature.feature.group,org.eclipse.jpt.jpa.eclipselink.feature.feature.group,org.eclipse.jpt.jaxb.eclipselink.feature.feature.group,org.eclipse.wst.common.fproj.feature.group,org.eclipse.jgit.pgm.feature.group,org.eclipse.egit.feature.group,org.eclipse.jgit.feature.group,org.eclipse.jgit.java7.feature.group,org.eclipse.mylyn.git.feature.group,org.eclipse.mylyn.github.feature.feature.group,org.eclipse.m2e.feature.feature.group,org.sonatype.m2e.mavenarchiver.feature.feature.group,org.eclipse.m2e.wtp.jaxrs.feature.feature.group,org.eclipse.m2e.wtp.jpa.feature.feature.group,org.eclipse.m2e.wtp.jsf.feature.feature.group,org.eclipse.m2e.wtp.feature.feature.group,org.eclipse.wst.server_adapters.feature.feature.group,org.eclipse.jst.enterprise_ui.feature.patch.feature.group
-# Start Eclipse with sudo to update it.
+
+# Git
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.egit.feature.group,org.eclipse.jgit.feature.group,org.eclipse.jgit.java7.feature.group,org.eclipse.jgit.pgm.feature.group
+
+# Dali Java Persistence Tools
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jpt.common.feature.feature.group,org.eclipse.jpt.common.eclipselink.feature.feature.group,org.eclipse.jpt.jpa.eclipselink.feature.feature.group,org.eclipse.jpt.jaxb.eclipselink.feature.feature.group
+
+# CDT (provides org.eclipse.cdt.managedbuilder.core.headlessbuild)
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.cdt.feature.group
+
+# JST Java Standard Tools
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jst.enterprise_ui.feature.feature.group,org.eclipse.jst.enterprise_ui.feature.patch.feature.group,org.eclipse.jst.web_ui.feature.feature.group
+
+# WST Web Standard Tools
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.wst.web_ui.feature.feature.group,org.eclipse.wst.xml_ui.feature.feature.group,org.eclipse.wst.common.fproj.feature.group,org.eclipse.wst.server_adapters.feature.feature.group
+
+# Maven
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.m2e.feature.feature.group,org.eclipse.m2e.wtp.jaxrs.feature.feature.group,org.eclipse.m2e.wtp.jpa.feature.feature.group,org.eclipse.m2e.wtp.jsf.feature.feature.group,org.eclipse.m2e.wtp.feature.feature.group,org.sonatype.m2e.mavenarchiver.feature.feature.group
+
+# Mylyn
+#sudo /opt/eclipse/eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /opt/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.mylyn.git.feature.group,org.eclipse.mylyn.github.feature.feature.group
