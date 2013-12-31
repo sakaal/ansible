@@ -1,7 +1,11 @@
+<!--- file: README.md -->
+
 ansible
 =======
 
 Public examples of some of my simplest Ansible playbooks
+
+This is how to quickly set up a Java development environment based on Fedora, Oracle JDK 7, Eclipse and Git.
 
 Install Fedora on a desktop or laptop with `root` only (without creating a user account).
 
