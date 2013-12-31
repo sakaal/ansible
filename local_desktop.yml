@@ -1,3 +1,5 @@
+# file: local_desktop.yml
+
 - hosts: localhost
   connection: local
   roles:
