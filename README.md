@@ -23,7 +23,7 @@ Edit `host_vars/localhost` with your profile details. Then run:
 
     ansible-playbook local_desktop.yml -i local
 
-Add your repository server host key to your `~/.ssh/known_hosts` before running:
+As the developer user, add your repository server host key to your `~/.ssh/known_hosts` and then run:
 
     ansible-playbook local_projects.yml -i local
 

@@ -1,6 +1,6 @@
 - name: ensure workspace exists
-  file: path="{{ pro_workspace }}" state=directory
+  file: path="{{ pro_workspace }}" state=directory owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
 
 - name: git checkout projects
-  git: force=no repo="{{ pro_repos }}/{{ item }}.git" dest="{{ pro_workspace }}/{{ item }}"
+  git: force=no repo="{{ pro_repos }}/{{ item }}.git" dest="{{ pro_workspace }}/{{ item }}" accept_hostkey=yes
   with_items: pro_modules

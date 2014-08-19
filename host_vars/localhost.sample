@@ -21,14 +21,16 @@ java_oracle_home: /usr/java/jdk1.8.0_11
 #
 eclipse_dirpath: luna/R
 eclipse_archive: eclipse-jee-luna-R-linux-gtk-x86_64.tar.gz
-eclipse_owner: jdoe
-eclipse_localdir: /home/jdoe
+eclipse_owner: "{{ profile_username | mandatory }}"
+eclipse_localdir: "/home/{{ eclipse_owner | mandatory }}"
 eclipse_release: Luna
+
+
 
 #
 # roles/projects
 #
-pro_workspace: /home/jdoe/workspace
+pro_workspace: "/home/{{ eclipse_owner | mandatory }}/workspace"
 pro_repos: git@github.com:sakaal
 pro_modules:
     - ansible
