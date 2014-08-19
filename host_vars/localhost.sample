@@ -10,19 +10,20 @@ profile_email: john.doe@example.com
 #
 # roles/java_oracle
 #
-java_oracle_dirpath: jdk/7u45-b18
-java_oracle_archive: jdk-7u45-linux-x64.rpm
+java_oracle_dirpath: jdk/8u11-b12
+java_oracle_archive: jdk-8u11-linux-x64.rpm
+java_oracle_sha1sum: 3ee1d89c53c34762cc2e9e10574d4dbfe2938ef6
 java_oracle_localdir: /opt
-java_oracle_home: /usr/java/jdk1.7.0_45
+java_oracle_home: /usr/java/jdk1.8.0_11
 
 #
 # roles/eclipse
 #
-eclipse_dirpath: kepler/SR1
-eclipse_archive: eclipse-jee-kepler-SR1-linux-gtk-x86_64.tar.gz
+eclipse_dirpath: luna/R
+eclipse_archive: eclipse-jee-luna-R-linux-gtk-x86_64.tar.gz
 eclipse_owner: jdoe
 eclipse_localdir: /home/jdoe
-eclipse_release: Kepler
+eclipse_release: Luna
 
 #
 # roles/projects

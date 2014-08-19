@@ -6,5 +6,8 @@
 - name: Git configuration
   template: src=gitconfig.j2 dest=/home/{{ profile_username }}/.gitconfig owner={{ profile_username }} group={{ profile_username }} mode=0664 force=no
 
+- name: Maven settings directory
+  file: path=/home/{{ profile_username }}/.m2 state=directory owner={{ profile_username }} group={{ profile_username }}
+
 - name: Maven settings
   template: src=settings.xml.j2 dest=/home/{{ profile_username }}/.m2/settings.xml owner={{ profile_username }} group={{ profile_username }} mode=0660 force=no backup=yes

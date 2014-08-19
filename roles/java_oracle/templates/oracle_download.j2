@@ -1,15 +1,16 @@
 #!/bin/bash
 CWD="$(pwd)"
-cd {{ java_oracle_localdir }}
+cd {{ java_oracle_localdir | mandatory }}
 CHECKSUM_FILE=/tmp/java_oracle_checksums
-FILENAME={{ java_oracle_archive }}
+FILENAME={{ java_oracle_archive | mandatory }}
 trap "{ rm -f $CHECKSUM_FILE ; cd "$CWD"; }" EXIT
 if [ ! -f {{ java_oracle_archive }} ]; then
-    wget -nv --no-cookies --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com"\
-    http://download.oracle.com/otn-pub/java/{{ java_oracle_dirpath }}/$FILENAME -O $FILENAME
+    wget -nv --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-secureback-cookie"\
+    http://download.oracle.com/otn-pub/java/{{ java_oracle_dirpath | mandatory }}/$FILENAME -O $FILENAME
 fi
+
+# Tested on Fedora 20
 cat > $CHECKSUM_FILE << EOF
-f16709533fff0eb5c8fb50273c662337df0aff29  jdk-7u45-linux-x64.rpm
-10a98c41a7ba8f66e5303ef6f80c5e2f8e1d8468  java_ee_sdk-7-jdk7-linux-x64.sh
+{{ java_oracle_sha1sum | mandatory }}  {{ java_oracle_archive | mandatory }}
 EOF
 sha1sum -c $CHECKSUM_FILE
