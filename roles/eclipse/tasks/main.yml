@@ -10,7 +10,7 @@
 - file: path="{{ eclipse_localdir }}/eclipse" recurse=yes state=directory owner={{ eclipse_owner }} group={{ eclipse_owner }}
 
 - name: Create Eclipse desktop launcher icon
-  template: src=eclipse.desktop.j2 dest=~{{ eclipse_owner }}/.local/share/applications/eclipse.desktop
+  template: src=eclipse.desktop.j2 dest=~{{ eclipse_owner }}/.local/share/applications/eclipse.desktop owner={{ eclipse_owner }} group={{ eclipse_owner }}
 
 # TODO: Eclipse feature groups
 
