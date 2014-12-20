@@ -1,3 +1,4 @@
+---
 # file: local_projects.yml
 
 - hosts: localhost

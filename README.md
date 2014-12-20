@@ -1,7 +1,6 @@
 <!--- file: README.md -->
 
-ansible
-=======
+# ansible
 
 Public examples of some of my simplest Ansible playbooks
 

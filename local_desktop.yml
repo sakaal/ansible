@@ -1,3 +1,4 @@
+---
 # file: local_desktop.yml
 
 - hosts: localhost
@@ -5,4 +6,5 @@
   roles:
   - common
   - developer_profile
+  - fedora_virtualization
   - java_oracle
