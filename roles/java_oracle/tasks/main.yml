@@ -1,3 +1,4 @@
+---
 # file: roles/java_oracle/tasks/main.yml
 
 - name: Prepare Oracle Java download script
@@ -13,13 +14,3 @@
   sudo: yes
   command: chdir={{ java_oracle_localdir }} rpm -U {{ java_oracle_archive }} creates="{{ java_oracle_home | mandatory }}"
   register: java_oracle_installed
-
-- name: Set Oracle java as default
-  sudo: yes
-  command: alternatives --set java "{{ java_oracle_home }}/bin/java"
-  when: java_oracle_installed.changed and ansible_distribution == 'Fedora'
-
-- name: Set Oracle jar as default
-  sudo: yes
-  command: alternatives --set jar "{{ java_oracle_home }}/bin/jar"
-  when: java_oracle_installed.changed and ansible_distribution == 'Fedora'
