@@ -1,36 +1,91 @@
+---
+# file: roles/eclipse/tasks/main.yml
+
 - name: Prepare Eclipse download script
-  template: src=eclipse_download.j2 dest={{ eclipse_localdir }}/eclipse_download.sh mode=0555
+  template: src=eclipse_download.j2
+            dest={{ eclipse_localdir }}/eclipse_download.sh
+            mode=0555
 
 - name: Download Eclipse
-  command: "{{ eclipse_localdir }}/eclipse_download.sh creates={{ eclipse_localdir }}/{{ eclipse_archive }}"
+  command: creates="{{ eclipse_localdir }}/{{ eclipse_archive }}"
+           "{{ eclipse_localdir }}/eclipse_download.sh"
 
 - name: Extract Eclipse
-  command: chdir="{{ eclipse_localdir }}" tar -xvf "{{ eclipse_archive }}" creates="eclipse"
+  command: chdir="{{ eclipse_localdir }}" creates="eclipse"
+           tar -xvf "{{ eclipse_archive }}"
 
-- file: path="{{ eclipse_localdir }}/eclipse" recurse=yes state=directory owner={{ eclipse_owner }} group={{ eclipse_owner }}
+- name: Eclipse directory owner and group
+  file: state=directory path="{{ eclipse_localdir }}/eclipse"
+        recurse=yes owner={{ eclipse_owner }} group={{ eclipse_owner }}
 
 - name: Create Eclipse desktop launcher icon
-  template: src=eclipse.desktop.j2 dest=~{{ eclipse_owner }}/.local/share/applications/eclipse.desktop owner={{ eclipse_owner }} group={{ eclipse_owner }}
+  template: src=eclipse.desktop.j2
+            dest=~{{ eclipse_owner }}/.local/share/applications/eclipse.desktop
+            owner={{ eclipse_owner }} group={{ eclipse_owner }}
 
-# TODO: Eclipse feature groups
+- set_fact: eclipse_release_repo="http://download.eclipse.org/releases/{{
+                                  eclipse_release|mandatory|lower }}"
 
-# Git
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.egit.feature.group,org.eclipse.jgit.feature.group,org.eclipse.jgit.java7.feature.group,org.eclipse.jgit.pgm.feature.group
+- name: Eclipse feature groups
+  with_items:
 
-# Dali Java Persistence Tools
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jpt.common.feature.feature.group,org.eclipse.jpt.common.eclipselink.feature.feature.group,org.eclipse.jpt.jpa.eclipselink.feature.feature.group,org.eclipse.jpt.jaxb.eclipselink.feature.feature.group
+  # Git
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.egit.feature.group
+    - org.eclipse.jgit.feature.group
+    - org.eclipse.jgit.java7.feature.group
+    - org.eclipse.jgit.pgm.feature.group
 
-# CDT (provides org.eclipse.cdt.managedbuilder.core.headlessbuild)
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.cdt.feature.group
+  # Dali Java Persistence Tools
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.jpt.common.feature.feature.group
+    - org.eclipse.jpt.common.eclipselink.feature.feature.group
+    - org.eclipse.jpt.jpa.eclipselink.feature.feature.group
+    - org.eclipse.jpt.jaxb.eclipselink.feature.feature.group
 
-# JST Java Standard Tools
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.jst.enterprise_ui.feature.feature.group,org.eclipse.jst.enterprise_ui.feature.patch.feature.group,org.eclipse.jst.web_ui.feature.feature.group
+  # CDT (provides org.eclipse.cdt.managedbuilder.core.headlessbuild)
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.cdt.feature.group
 
-# WST Web Standard Tools
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.wst.web_ui.feature.feature.group,org.eclipse.wst.xml_ui.feature.feature.group,org.eclipse.wst.common.fproj.feature.group,org.eclipse.wst.server_adapters.feature.feature.group
+  # JST Java Standard Tools
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.jst.enterprise_ui.feature.feature.group
+    - org.eclipse.jst.web_ui.feature.feature.group
 
-# Maven
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.m2e.feature.feature.group,org.eclipse.m2e.wtp.jaxrs.feature.feature.group,org.eclipse.m2e.wtp.jpa.feature.feature.group,org.eclipse.m2e.wtp.jsf.feature.feature.group,org.eclipse.m2e.wtp.feature.feature.group,org.sonatype.m2e.mavenarchiver.feature.feature.group
+  # WST Web Standard Tools
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.wst.web_ui.feature.feature.group
+    - org.eclipse.wst.xml_ui.feature.feature.group
+    - org.eclipse.wst.common.fproj.feature.group
+    - org.eclipse.wst.server_adapters.feature.feature.group
 
-# Mylyn
-#eclipse -clean -purgeHistory -application org.eclipse.equinox.p2.director -noSplash -repository http://download.eclipse.org/releases/kepler -destination /home/jdoe/eclipse -profileProperties org.eclipse.update.install.features=true -installIU org.eclipse.mylyn.git.feature.group,org.eclipse.mylyn.github.feature.feature.group
+  # Maven
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.m2e.feature.feature.group
+    - org.eclipse.m2e.wtp.jaxrs.feature.feature.group
+    - org.eclipse.m2e.wtp.jpa.feature.feature.group
+    - org.eclipse.m2e.wtp.jsf.feature.feature.group
+    - org.eclipse.m2e.wtp.feature.feature.group
+    - org.sonatype.m2e.mavenarchiver.feature.feature.group
+
+  # Mylyn
+  - repository: "{{ eclipse_release_repo }}"
+    units:
+    - org.eclipse.mylyn.git.feature.group
+    - org.eclipse.mylyn.github.feature.feature.group
+
+  command: >
+           {{ eclipse_localdir | mandatory }}/eclipse/eclipse
+           -clean -purgeHistory
+           -application org.eclipse.equinox.p2.director -noSplash
+           -repository {{ item.repository | mandatory }}
+           -destination "{{ eclipse_localdir }}/eclipse"
+           -profileProperties org.eclipse.update.install.features=true
+           -installIU {{ item.units | mandatory | join(',') }}
+  ignore_errors: yes

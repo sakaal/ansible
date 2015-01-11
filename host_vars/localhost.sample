@@ -23,7 +23,7 @@ eclipse_dirpath: luna/SR1
 eclipse_archive: eclipse-jee-luna-SR1-linux-gtk-x86_64.tar.gz
 eclipse_owner: "{{ profile_username | mandatory }}"
 eclipse_localdir: "/home/{{ eclipse_owner | mandatory }}"
-eclipse_release: Luna
+eclipse_release: luna
 
 #
 # roles/projects
