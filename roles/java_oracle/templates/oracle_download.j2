@@ -9,7 +9,7 @@ if [ ! -f {{ java_oracle_archive }} ]; then
     http://download.oracle.com/otn-pub/java/{{ java_oracle_dirpath | mandatory }}/$FILENAME -O $FILENAME
 fi
 
-# Tested on Fedora 20
+# Tested on Fedora 21
 cat > $CHECKSUM_FILE << EOF
 {{ java_oracle_sha1sum | mandatory }}  {{ java_oracle_archive | mandatory }}
 EOF
