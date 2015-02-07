@@ -1,6 +1,32 @@
-- name: ensure workspace exists
-  file: path="{{ pro_workspace }}" state=directory owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
+---
+# file: roles/projects/tasks/main.yml
 
-- name: git checkout projects
-  git: force=no repo="{{ pro_repos }}/{{ item }}.git" dest="{{ pro_workspace }}/{{ item }}" accept_hostkey=yes
+#
+# Configures the Eclipse workspace settings and projects from revision control
+#
+
+- name: Workspace
+  file: state=directory path="{{ pro_workspace }}"
+        owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
+
+- name: Workspace plugin settings directories
+  with_items: eclipse_preferences | default([])
+  file: state=directory
+        path="{{ pro_workspace }}/.metadata/.plugins/{{ item.plugin | mandatory
+              }}/.settings"
+        owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
+
+- name: Workspace plugin settings files
+  with_subelements:
+  - eclipse_preferences
+  - prefs
+  lineinfile: dest="{{ pro_workspace }}/.metadata/.plugins/{{ item.0.plugin
+              | mandatory }}/.settings/{{ item.0.settings | mandatory }}.prefs"
+              line="{{ item.1.key | mandatory }}={{ item.1.val }}"
+              regexp="^\s*{{ item.1.key }}=.*$" state=present
+              create=yes owner={{ eclipse_owner }} group={{ eclipse_owner }}
+
+- name: Git checkout projects
   with_items: pro_modules
+  git: force=no repo="{{ pro_repos }}/{{ item }}.git"
+       dest="{{ pro_workspace }}/{{ item }}" accept_hostkey=yes
