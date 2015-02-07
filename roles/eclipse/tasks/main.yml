@@ -37,28 +37,22 @@
     - org.eclipse.jgit.java7.feature.group
     - org.eclipse.jgit.pgm.feature.group
 
-  # Dali Java Persistence Tools
-  - repository: "{{ eclipse_release_repo }}"
-    units:
-    - org.eclipse.jpt.common.feature.feature.group
-    - org.eclipse.jpt.common.eclipselink.feature.feature.group
-    - org.eclipse.jpt.jpa.eclipselink.feature.feature.group
-    - org.eclipse.jpt.jaxb.eclipselink.feature.feature.group
-
   # CDT (provides org.eclipse.cdt.managedbuilder.core.headlessbuild)
   - repository: "{{ eclipse_release_repo }}"
     units:
     - org.eclipse.cdt.feature.group
 
-  # JST Java Standard Tools
-  - repository: "{{ eclipse_release_repo }}"
+  - repository: "http://download.eclipse.org/webtools/repository/{{ eclipse_release|mandatory|lower }}"
     units:
+    # Dali Java Persistence Tools
+    - org.eclipse.jpt.common.feature.feature.group
+    - org.eclipse.jpt.common.eclipselink.feature.feature.group
+    - org.eclipse.jpt.jpa.eclipselink.feature.feature.group
+    - org.eclipse.jpt.jaxb.eclipselink.feature.feature.group
+    # JST Java Standard Tools
     - org.eclipse.jst.enterprise_ui.feature.feature.group
     - org.eclipse.jst.web_ui.feature.feature.group
-
-  # WST Web Standard Tools
-  - repository: "{{ eclipse_release_repo }}"
-    units:
+    # WST Web Standard Tools
     - org.eclipse.wst.web_ui.feature.feature.group
     - org.eclipse.wst.xml_ui.feature.feature.group
     - org.eclipse.wst.common.fproj.feature.group
@@ -73,6 +67,11 @@
     - org.eclipse.m2e.wtp.jsf.feature.feature.group
     - org.eclipse.m2e.wtp.feature.feature.group
     - org.sonatype.m2e.mavenarchiver.feature.feature.group
+
+  # m2e Tycho Configurator
+  - repository: "http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-tycho/0.9.0/N/LATEST/"
+    units:
+    - org.sonatype.tycho.m2e.feature.feature.group
 
   # Mylyn
   - repository: "{{ eclipse_release_repo }}"
