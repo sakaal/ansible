@@ -10,7 +10,7 @@
         owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
 
 - name: Workspace plugin settings directories
-  with_items: eclipse_preferences | default([])
+  with_items: eclipse_workspace_preferences | default([])
   file: state=directory
         path="{{ pro_workspace }}/.metadata/.plugins/{{ item.plugin | mandatory
               }}/.settings"
@@ -18,7 +18,7 @@
 
 - name: Workspace plugin settings files
   with_subelements:
-  - eclipse_preferences
+  - eclipse_workspace_preferences
   - prefs
   lineinfile: dest="{{ pro_workspace }}/.metadata/.plugins/{{ item.0.plugin
               | mandatory }}/.settings/{{ item.0.settings | mandatory }}.prefs"

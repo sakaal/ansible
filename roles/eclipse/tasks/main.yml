@@ -23,6 +23,16 @@
             dest=~{{ eclipse_owner }}/.local/share/applications/eclipse.desktop
             owner={{ eclipse_owner }} group={{ eclipse_owner }}
 
+- name: Eclipse configuration settings files
+  with_subelements:
+  - eclipse_configuration
+  - prefs
+  lineinfile: dest="{{ eclipse_localdir }}/eclipse/configuration/.settings/{{
+                    item.0.module | mandatory }}.prefs"
+              line="{{ item.1.key | mandatory }}={{ item.1.val }}"
+              regexp="^\s*{{ item.1.key }}=.*$" state=present
+              create=yes owner={{ eclipse_owner }} group={{ eclipse_owner }}
+
 - name: Eclipse feature groups
   with_items: eclipse_feature_groups | default([])
   command: >

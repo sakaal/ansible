@@ -81,6 +81,94 @@ eclipse_feature_groups:
   - org.eclipse.mylyn.git.feature.group
   - org.eclipse.mylyn.github.feature.feature.group
 
+- repository: "http://download.jboss.org/jbosstools/updates/stable/{{ eclipse_release|lower }}/"
+  units:
+  # JBoss Tools
+
+  # JBoss Tools Foundation
+  - org.jboss.tools.foundation.feature.feature.group
+
+  # JBoss Tools Foundation Security for Linux
+  - org.jboss.tools.foundation.security.linux.feature.feature.group
+
+  # JBoss Tools Common
+  - org.jboss.tools.common.feature.feature.group
+
+  # JBoss Tools Java Standard Tools
+  - org.jboss.tools.jst.feature.feature.group
+
+  # Context and Dependency Injection Tools
+  - org.jboss.tools.cdi.feature.feature.group
+
+  # Maven SCM Handler for EGit
+  - org.sonatype.m2e.egit.feature.feature.group
+
+  # JBoss Maven Integration
+  - org.jboss.tools.maven.feature.feature.group
+
+  # JBoss Maven Source Lookup
+  - org.jboss.tools.maven.sourcelookup.feature.feature.group
+
+  # JBoss Maven CDI Configurator
+  - org.jboss.tools.maven.cdi.feature.feature.group
+
+  # JBoss Maven Endorsed Libraries Configurator
+  - org.jboss.tools.maven.jdt.feature.feature.group
+
+  # JBoss Maven Hibernate Configurator
+  - org.jboss.tools.maven.hibernate.feature.feature.group
+
+  # Hibernate Tools
+  - org.hibernate.eclipse.feature.feature.group
+
+  # Project Examples
+  - org.jboss.tools.project.examples.feature.feature.group
+
+  # JBoss Maven Project Examples
+  - org.jboss.tools.maven.project.examples.feature.feature.group
+
+  # JBoss Runtime Detection Core
+  - org.jboss.tools.runtime.core.feature.feature.group
+
+  # JBoss Tools Apache Tomcat Integration
+  - org.jboss.tools.wtp.runtimes.tomcat.feature.feature.group
+
+  # JBoss JAX-RS Tools
+  - org.jboss.tools.ws.jaxrs.feature.feature.group
+
+  # JBoss Tools Community Project Examples
+  - org.jboss.tools.community.project.examples.feature.feature.group
+
+  # JBoss Tools EGit Integration
+  - org.jboss.tools.openshift.egit.integration.feature.feature.group
+
+  # JBoss Tools Java Standard Tools AngularJS
+  - org.jboss.tools.jst.angularjs.feature.feature.group
+
+  # JBoss Tools Java Standard Tools Tern.java Adapter
+  - org.jboss.tools.jst.jsdt.feature.feature.group
+
+  # JMX Console
+  - org.jboss.tools.jmx.feature.feature.group
+
+  # JBossAS Tools Server Adapter
+  - org.jboss.ide.eclipse.as.serverAdapter.wtp.feature.feature.group
+
+  # JBossAS Tools
+  - org.jboss.ide.eclipse.as.feature.feature.group
+
+  # JBoss Tools Maven Packaging Configurator
+  - org.jboss.tools.maven.jbosspackaging.feature.feature.group
+
+  # JBoss Tools Mobile Browser Simulator
+  - org.jboss.tools.vpe.browsersim.feature.feature.group
+
+  # JBoss Tools Visual Page Editor
+  - org.jboss.tools.vpe.feature.feature.group
+
+  # JBoss WebServices Tools
+  - org.jboss.tools.ws.feature.feature.group
+
 #
 # roles/projects
 #
@@ -89,7 +177,17 @@ pro_repos: git@github.com:sakaal
 pro_modules:
     - ansible
 
-eclipse_preferences:
+eclipse_configuration:
+
+# JBoss Tools
+- module: org.jboss.tools.usage
+  prefs:
+  - key: allow_usage_report_preference
+    val: "false"
+  - key: ask_user_for_usage_report_preference
+    val: "false"
+
+eclipse_workspace_preferences:
 
 # Editors
 - plugin: org.eclipse.core.runtime
