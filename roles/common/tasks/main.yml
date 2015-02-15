@@ -1,18 +1,26 @@
+---
 # file: roles/common/tasks/main.yml
 
-- yum: pkg=firewalld state=present
-- yum: pkg=gdb state=present
-- yum: pkg=git state=present
-- yum: pkg=htop state=present
-- yum: pkg=jwhois state=present
-- yum: pkg=lftp state=present
-- yum: pkg=libselinux-python state=present
-- yum: pkg=man state=present
-- yum: pkg=maven state=present
-- yum: pkg=nano state=present
-- yum: pkg=postgresql state=present
-- yum: pkg=python-boto state=present
-- yum: pkg=rkhunter state=present
-- yum: pkg=screen state=present
-- yum: pkg=wget state=present
-- service: name=firewalld enabled=yes state=started
+- name: Common packages
+  with_items:
+  - firewalld
+  - gdb
+  - git
+  - gnupg
+  - htop
+  - jwhois
+  - lftp
+  - libselinux-python
+  - lookup
+  - lv
+  - man
+  - maven
+  - midori
+  - nano
+  - postgresql
+  - pv
+  - python-boto
+  - rkhunter
+  - screen
+  - wget
+  yum: name={{ item }}
