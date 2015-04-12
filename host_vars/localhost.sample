@@ -11,11 +11,11 @@ profile_email: john.doe@example.com
 #
 # roles/java_oracle
 #
-java_oracle_dirpath: jdk/8u31-b13
-java_oracle_archive: jdk-8u31-linux-x64.rpm
-java_oracle_sha1sum: cac72f4125a609f0cdf8fb3ab70dd102c20393a7
+java_oracle_dirpath: jdk/8u40-b26
+java_oracle_archive: jdk-8u40-linux-x64.rpm
+java_oracle_sha1sum: 21285c48ca0b80573dda999d44ee3fcd797cc3d4
 java_oracle_localdir: /opt
-java_oracle_home: /usr/java/jdk1.8.0_31
+java_oracle_home: /usr/java/jdk1.8.0_40
 
 #
 # roles/eclipse
