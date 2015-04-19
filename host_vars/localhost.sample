@@ -20,8 +20,9 @@ java_oracle_home: /usr/java/jdk1.8.0_40
 #
 # roles/eclipse
 #
-eclipse_dirpath: luna/SR1
-eclipse_archive: eclipse-jee-luna-SR1-linux-gtk-x86_64.tar.gz
+eclipse_dirpath: luna/SR2
+eclipse_archive: eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz
+eclipse_sha1sum: df680622332c69303d23b14afe33281aca774f8e
 eclipse_owner: "{{ profile_username | mandatory }}"
 eclipse_localdir: "/home/{{ eclipse_owner | mandatory }}"
 eclipse_release: luna
@@ -75,6 +76,11 @@ eclipse_feature_groups:
   # m2e Tycho Configurator
   - org.sonatype.tycho.m2e.feature.feature.group
 
+- repository: "http://repo1.maven.org/maven2/.m2e/connectors/m2eclipse-buildhelper/0.15.0/N/0.15.0.201405280027/"
+  units:
+  # m2e connector for build-helper-maven-plugin
+  - org.sonatype.m2e.buildhelper.feature.feature.group
+
 - repository: "{{ eclipse_release_repo }}"
   units:
   # Mylyn
@@ -127,6 +133,13 @@ eclipse_feature_groups:
   # JBoss Maven Project Examples
   - org.jboss.tools.maven.project.examples.feature.feature.group
 
+  # JBoss Tools Maven Packaging Configurator
+  - org.jboss.tools.maven.jbosspackaging.feature.feature.group
+
+  # JBoss Tools Maven Integration for Eclipse JDT APT
+  # m2e-apt connector for Eclipse JDT Annotation Processor Toolkit
+  - org.jboss.tools.maven.apt.feature.feature.group
+
   # JBoss Runtime Detection Core
   - org.jboss.tools.runtime.core.feature.feature.group
 
@@ -156,9 +169,6 @@ eclipse_feature_groups:
 
   # JBossAS Tools
   - org.jboss.ide.eclipse.as.feature.feature.group
-
-  # JBoss Tools Maven Packaging Configurator
-  - org.jboss.tools.maven.jbosspackaging.feature.feature.group
 
   # JBoss Tools Mobile Browser Simulator
   - org.jboss.tools.vpe.browsersim.feature.feature.group

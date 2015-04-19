@@ -1,3 +1,4 @@
+{# file: roles/eclipse/templates/eclipse_download.j2 #}
 #!/bin/bash
 CWD="$(pwd)"
 cd {{ eclipse_localdir }}
@@ -9,8 +10,7 @@ if [ ! -f {{ eclipse_archive }} ]; then
 fi
 
 cat > $CHECKSUM_FILE << EOF
-609de96abce7f0133f909b96a413135291ca27be  eclipse-jee-luna-R-linux-gtk-x86_64.tar.gz
+{{ eclipse_sha1sum | mandatory }}  {{ eclipse_archive | mandatory }}
 EOF
-# 801234dd0187899e6e2e49a85842d5c75afa2a7d  eclipse-jee-kepler-SR1-linux-gtk-x86_64.tar.gz
 
 sha1sum -c $CHECKSUM_FILE
