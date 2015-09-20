@@ -197,6 +197,12 @@ eclipse_configuration:
   - key: ask_user_for_usage_report_preference
     val: "false"
 
+# TODO:
+#/instance/org.eclipse.wst.css.core/indentationChar=space
+#/instance/org.eclipse.wst.css.core/indentationSize=2
+#/instance/org.eclipse.wst.html.core/indentationChar=space
+#/instance/org.eclipse.wst.html.core/indentationSize=2
+
 eclipse_workspace_preferences:
 
 # Editors
