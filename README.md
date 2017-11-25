@@ -25,7 +25,7 @@ Edit `host_vars/localhost` with your profile details. Then run:
 
     ansible-playbook -v -i local local_node.yaml
 
-As a non-root user, add your repository server host key to your `~/.ssh/known_hosts` and then run:
+Add the repository server host keys to `~/.ssh/known_hosts` and then run:
 
     ansible-playbook -v -i local working_copies.yaml
 
