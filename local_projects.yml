@@ -1,8 +1,0 @@
----
-# file: local_projects.yml
-
-- hosts: localhost
-  connection: local
-  roles:
-  - eclipse
-  - projects

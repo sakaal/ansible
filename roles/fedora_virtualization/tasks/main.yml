@@ -1,5 +1,5 @@
----
 # file: roles/fedora_virtualization/tasks/main.yml
+---
 
 - name: Virtualization packages
   with_items:
@@ -7,18 +7,18 @@
   - libvirt
   - libguestfs-tools
   - avahi-dnsconfd
-  sudo: yes
-  yum: name="{{ item }}" state=present
+  become: yes
+  dnf: name="{{ item }}" state=present
 
 - name: Verify Linux KVM kernel modules
-  sudo: yes
+  become: yes
   shell: lsmod | grep kvm
   register: kernel_modules
   changed_when: False
   failed_when: not 'kvm' in kernel_modules.stdout
 
 - name: Allow libvirt management access
-  sudo: yes
+  become: yes
   template: src=libvirt-policy.conf.j2
             dest="/etc/polkit-1/localauthority.conf.d/50-libvirt-policy.conf"
             owner=root group=root mode=0644
@@ -28,5 +28,5 @@
   - dbus
   - avahi-daemon
   - libvirtd
-  sudo: yes
-  service: name={{ item }} state=started enabled=yes
+  become: yes
+  service: name="{{ item }}" state=started enabled=yes

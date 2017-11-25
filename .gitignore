@@ -1,3 +1,4 @@
 *~
 .project
 host_vars/localhost
+*.retry

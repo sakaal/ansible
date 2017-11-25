@@ -1,13 +1,45 @@
 # file: roles/developer_profile/tasks/main.yml
+---
 
 - name: Developer user account
-  user: name={{ profile_username }} comment="{{ profile_fullname }}" append=yes groups=wheel shell=/bin/bash generate_ssh_key=yes ssh_key_comment={{ profile_username }}@{{ ansible_fqdn }}-{{ ansible_date_time.iso8601 }} state=present
+  with_items: "{{ local_users | default([]) }}"
+  user:
+    name: "{{ item.user }}"
+    comment: "{{ item.fullname }}"
+    append: yes
+    groups: "{{ item.groups | default('') }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    generate_ssh_key: yes
+    ssh_key_bits: "{{ ssh_key_bits | default(4096) }}"
+    ssh_key_type: "{{ ssh_key_type | default('rsa') }}"
+    ssh_key_comment: "{{ item.user }}@{{ ansible_fqdn }}_{{ ansible_date_time.iso8601 | replace(':', '') }}"
+    state: "{{ item.state | default('present') }}"
 
 - name: Git configuration
-  template: src=gitconfig.j2 dest=/home/{{ profile_username }}/.gitconfig owner={{ profile_username }} group={{ profile_username }} mode=0664 force=no
+  with_items: "{{ local_users | default([]) }}"
+  template:
+    src: gitconfig.j2
+    dest: "/home/{{ item.user }}/.gitconfig"
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
+    mode: 0664
+    force: no
 
 - name: Maven settings directory
-  file: path=/home/{{ profile_username }}/.m2 state=directory owner={{ profile_username }} group={{ profile_username }}
+  with_items: "{{ local_users | default([]) }}"
+  file:
+    path: "/home/{{ item.user }}/.m2"
+    state: directory
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
 
 - name: Maven settings
-  template: src=settings.xml.j2 dest=/home/{{ profile_username }}/.m2/settings.xml owner={{ profile_username }} group={{ profile_username }} mode=0660 force=no backup=yes
+  with_items: "{{ local_users | default([]) }}"
+  template:
+    src: settings.xml.j2
+    dest: "/home/{{ item.user }}/.m2/settings.xml"
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
+    mode: 0660
+    force: no
+    backup: yes

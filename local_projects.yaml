@@ -1,0 +1,12 @@
+# file: local_projects.yaml
+---
+
+- hosts: localhost
+  connection: local
+  pre_tasks:
+  - with_items:
+    - java-1.8.0-openjdk
+    dnf: name="{{ item }}"
+  roles:
+  - eclipse
+  - projects

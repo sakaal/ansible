@@ -1,5 +1,5 @@
+# file: local_desktop.yaml
 ---
-# file: local_desktop.yml
 
 - hosts: localhost
   connection: local
@@ -7,4 +7,3 @@
   - common
   - developer_profile
   - fedora_virtualization
-  - java_oracle

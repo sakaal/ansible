@@ -1,5 +1,5 @@
----
 # file: roles/common/tasks/main.yml
+---
 
 - name: Common packages
   with_items:
@@ -23,4 +23,4 @@
   - rkhunter
   - screen
   - wget
-  yum: name={{ item }}
+  dnf: name={{ item }}

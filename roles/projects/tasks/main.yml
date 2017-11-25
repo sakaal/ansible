@@ -1,32 +1,33 @@
----
 # file: roles/projects/tasks/main.yml
-
 #
 # Configures the Eclipse workspace settings and projects from revision control
 #
+---
 
 - name: Workspace
   file: state=directory path="{{ pro_workspace }}"
-        owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
+        owner="{{ eclipse_owner }}" group="{{ eclipse_owner }}"
 
 - name: Workspace plugin settings directories
-  with_items: eclipse_workspace_preferences | default([])
+  with_items: "{{ eclipse_workspace_preferences | default([]) }}"
+  when: item.plugin is defined
   file: state=directory
-        path="{{ pro_workspace }}/.metadata/.plugins/{{ item.plugin | mandatory
+        path="{{ pro_workspace }}/.metadata/.plugins/{{ item.plugin
               }}/.settings"
-        owner={{ eclipse_owner | mandatory }} group={{ eclipse_owner }}
+        owner="{{ eclipse_owner }}" group="{{ eclipse_owner }}"
 
 - name: Workspace plugin settings files
   with_subelements:
-  - eclipse_workspace_preferences
+  - "{{ eclipse_workspace_preferences | default([]) }}"
   - prefs
+  when: item.0.plugin is defined
   lineinfile: dest="{{ pro_workspace }}/.metadata/.plugins/{{ item.0.plugin
-              | mandatory }}/.settings/{{ item.0.settings | mandatory }}.prefs"
-              line="{{ item.1.key | mandatory }}={{ item.1.val }}"
+              }}/.settings/{{ item.0.settings }}.prefs"
+              line="{{ item.1.key }}={{ item.1.val }}"
               regexp="^\s*{{ item.1.key }}=.*$" state=present
-              create=yes owner={{ eclipse_owner }} group={{ eclipse_owner }}
+              create=yes owner="{{ eclipse_owner }}" group="{{ eclipse_owner }}"
 
 - name: Git checkout projects
-  with_items: pro_modules
+  with_items: "{{ pro_modules }}"
   git: force=no repo="{{ pro_repos }}/{{ item }}.git"
        dest="{{ pro_workspace }}/{{ item }}" accept_hostkey=yes

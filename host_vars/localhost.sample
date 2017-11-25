@@ -1,21 +1,16 @@
----
 # file: host_vars/localhost
+---
 
 #
 # roles/developer_profile
 #
-profile_username: jdoe
-profile_fullname: John Doe
-profile_email: john.doe@example.com
-
-#
-# roles/java_oracle
-#
-java_oracle_dirpath: jdk/8u40-b26
-java_oracle_archive: jdk-8u40-linux-x64.rpm
-java_oracle_sha1sum: 21285c48ca0b80573dda999d44ee3fcd797cc3d4
-java_oracle_localdir: /opt
-java_oracle_home: /usr/java/jdk1.8.0_40
+local_users:
+- user: "jdoe"
+  fullname: "John Doe"
+  email: "john.doe@example.com"
+  groups: "wheel"
+  shell: "/bin/bash"
+  state: "present"
 
 #
 # roles/eclipse
@@ -23,12 +18,11 @@ java_oracle_home: /usr/java/jdk1.8.0_40
 eclipse_dirpath: luna/SR2
 eclipse_archive: eclipse-jee-luna-SR2-linux-gtk-x86_64.tar.gz
 eclipse_sha1sum: df680622332c69303d23b14afe33281aca774f8e
-eclipse_owner: "{{ profile_username | mandatory }}"
-eclipse_localdir: "/home/{{ eclipse_owner | mandatory }}"
+eclipse_owner: "{{ local_users[0].user }}"
+eclipse_localdir: "/home/{{ eclipse_owner }}"
 eclipse_release: luna
 
-eclipse_release_repo: "http://download.eclipse.org/releases/{{
-                       eclipse_release|mandatory|lower }}"
+eclipse_release_repo: "http://download.eclipse.org/releases/{{ eclipse_release | lower }}"
 
 eclipse_feature_groups:
 
@@ -45,7 +39,7 @@ eclipse_feature_groups:
   # CDT (provides org.eclipse.cdt.managedbuilder.core.headlessbuild)
   - org.eclipse.cdt.feature.group
 
-- repository: "http://download.eclipse.org/webtools/repository/{{ eclipse_release|mandatory|lower }}"
+- repository: "http://download.eclipse.org/webtools/repository/{{ eclipse_release | lower }}"
   units:
   # Dali Java Persistence Tools
   - org.eclipse.jpt.common.feature.feature.group
@@ -87,7 +81,7 @@ eclipse_feature_groups:
   - org.eclipse.mylyn.git.feature.group
   - org.eclipse.mylyn.github.feature.feature.group
 
-- repository: "http://download.jboss.org/jbosstools/updates/stable/{{ eclipse_release|lower }}/"
+- repository: "http://download.jboss.org/jbosstools/updates/stable/{{ eclipse_release | lower }}/"
   units:
   # JBoss Tools
 
@@ -182,7 +176,7 @@ eclipse_feature_groups:
 #
 # roles/projects
 #
-pro_workspace: "/home/{{ eclipse_owner | mandatory }}/workspace"
+pro_workspace: "/home/{{ eclipse_owner }}/workspace"
 pro_repos: git@github.com:sakaal
 pro_modules:
     - ansible
