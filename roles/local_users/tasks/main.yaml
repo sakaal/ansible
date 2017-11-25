@@ -1,7 +1,7 @@
-# file: roles/developer_profile/tasks/main.yml
+# file: roles/local_users/tasks/main.yaml
 ---
 
-- name: Developer user account
+- name: Local user accounts
   with_items: "{{ local_users | default([]) }}"
   user:
     name: "{{ item.user }}"

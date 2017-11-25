@@ -1,9 +1,0 @@
-# file: local_desktop.yaml
----
-
-- hosts: localhost
-  connection: local
-  roles:
-  - common
-  - developer_profile
-  - fedora_virtualization

@@ -1,0 +1,7 @@
+# file: working_copies.yaml
+---
+
+- hosts: localhost
+  connection: local
+  roles:
+  - working_copies

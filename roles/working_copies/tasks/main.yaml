@@ -1,0 +1,12 @@
+# file: roles/working_copies/tasks/main.yaml
+---
+
+- name: Git checkout repositories
+  with_items: "{{ git_repositories }}"
+  become_user: item.owner
+  git:
+    force: no
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    accept_hostkey: yes
+    key_file: "/home/{{ item.owner }}/.ssh/id_rsa"

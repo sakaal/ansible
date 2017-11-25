@@ -1,0 +1,50 @@
+# file: roles/common/tasks/main.yaml
+---
+
+- name: Archivers and data transfer tools
+  with_items:
+  - bzip2
+  - curl
+  - gzip
+  - p7zip
+  - unzip
+  - wget
+  dnf:
+    name: "{{ item }}"
+
+- name: Common packages
+  with_items:
+  - bind-utils
+  - gdb
+  - gnupg
+  - htop
+  - iotop
+  - iptraf
+  - java-1.8.0-openjdk
+  - jwhois
+  - kpcli
+  - lftp
+  - libselinux-python
+  - lookup
+  - lshw
+  - lv
+  - man
+  - maven
+  - mtr
+  - nano
+  - net-tools
+  - parallel
+  - pciutils
+  - postgresql
+  - procps
+  - putty
+  - pv
+  - python-boto
+  - python-setuptools
+  - python-pip
+  - screen
+  - strace
+  - sysstat
+  - tcpdump
+  dnf:
+    name: "{{ item }}"

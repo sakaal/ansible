@@ -4,27 +4,30 @@
 
 Public examples of some of my simplest Ansible playbooks
 
-This is how to quickly set up a Java development environment
-based on Fedora, OpenJDK, Git, Maven and Eclipse.
+This is how to quickly set up a configuration management node
+based on Fedora, Git, and Ansible.
 
-Install Fedora on a desktop or laptop.
-If you don't create a developer user account during install,
+Install Fedora on a desktop, laptop, or server.
+If you didn't create a non-root user account during install,
 this playbook will do it for you.
 
 As `root` on the newly installed machine:
 
-    dnf install git ansible
-    git clone https://github.com/sakaal/ansible.git
-    cd ansible
+    dnf install ansible git
+    cd /etc/ansible
+    git init .
+    git remote add -t \* -f origin https://github.com/sakaal/ansible.git
+    git fetch --all
+    git reset --hard origin/master
     cp host_vars/localhost.sample host_vars/localhost
 
 Edit `host_vars/localhost` with your profile details. Then run:
 
-    ansible-playbook -v -i local local_desktop.yaml
+    ansible-playbook -v -i local local_node.yaml
 
-As the developer user, add your repository server host key to your `~/.ssh/known_hosts` and then run:
+As a non-root user, add your repository server host key to your `~/.ssh/known_hosts` and then run:
 
-    ansible-playbook -v -i local local_projects.yaml
+    ansible-playbook -v -i local working_copies.yaml
 
 These are incomplete examples just to help you get started with Ansible.
 
