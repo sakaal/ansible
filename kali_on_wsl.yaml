@@ -1,0 +1,210 @@
+# file: kali_on_wsl.yaml
+#
+# Enable the Windows Subsystem for Linux (WSL) and install Kali Linux
+# from the Windows App Store:
+# https://www.kali.org/news/kali-linux-in-the-windows-app-store/
+#
+# You can then download and run this script in Kali bash shell:
+#
+# sudo apt-get install ansible
+# wget https://raw.githubusercontent.com/sakaal/ansible/master/kali_on_wsl.yaml
+#
+# Do review the script before running it.
+#
+# ansible-playbook kali_on_wsl.yaml --ask-become-pass
+#
+# Please install VcXsrv (or any Windows X-server) separately.
+#
+---
+
+- name: Preflight check privileges
+  hosts: all:localhost
+  become: yes # On a play, sets the ansible_user_id to root.
+  tasks:
+
+  - name: Running as a non-root user with sudo privileges?
+    when: ansible_user == ansible_user_id
+    fail:
+      msg: "Please run this playbook as a non-root user with sudo privileges."
+
+#
+
+- name: Preflight check environment
+  hosts: all:localhost
+  tasks:
+
+  - name: Running Kali on Windows Subsystem for Linux?
+    with_items:
+    - value: "{{ ansible_kernel }}"
+      regexp: "^.*Microsoft$"
+    - value: "{{ ansible_os_family }}"
+      regexp: "^Kali.*$"
+    when: item.value is not match( item.regexp )
+    fail:
+      msg: "{{ item.value }} does not match {{ item.regexp }}"
+
+  - name: Resolve the Windows user profile path
+    environment:
+      PATH: "{{ lookup('env', 'PATH') }}"
+    shell: cmd.exe /c '<nul set /p=%UserProfile%' 2>/dev/null
+    failed_when: win_userprofile_result.rc != 1
+    changed_when: no
+    register: win_userprofile_result
+
+  - name: Resolve the Windows user profile drive and directory
+    set_fact:
+      win_userprofile_drive: "{{ win_userprofile_result.stdout.split(':')[0] }}:"
+      win_userprofile_dir: "{{ win_userprofile_result.stdout.split(':')[1]
+                             | regex_replace('\\\\', '/') }}"
+
+  - name: Resolve the user profile mount point
+    command: findmnt --noheadings --first-only --output TARGET "{{ win_userprofile_drive }}"
+    changed_when: no
+    register: win_userprofile_mount_result
+
+  - name: Resolve the user profile full path
+    set_fact:
+      userprofile: "{{ win_userprofile_mount_result.stdout }}{{ win_userprofile_dir }}"
+
+  - name: User profile
+    debug: var=userprofile
+
+  - name: Check if .ssh directory exists under the user profile
+    stat:
+      path: "{{ userprofile }}/.ssh"
+    register: userprofile_ssh_result
+
+#
+
+- name: Common configuration
+  hosts: all:localhost
+  tasks:
+
+#  - name: sudo without password
+#    become: yes
+#    lineinfile:
+#      dest: "/etc/sudoers.d/{{ ansible_user }}"
+#      line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
+#      regexp: "^{{ ansible_user }}\\s+"
+
+  - name: Tools
+    with_items:
+    - name: git
+    - name: metasploit-framework
+    become: yes
+    apt:
+      name: "{{ item.name }}"
+      state: "{{ item.state | default('present') }}"
+
+  - name: Xfce4 and Mesa utilities
+    with_items:
+    - name: xfce4-terminal
+    - name: xfce4
+    - name: mesa-utils
+    become: yes
+    apt:
+      name: "{{ item.name }}"
+      state: "{{ item.state | default('present') }}"
+
+  - name: export X Server environment in .bashrc
+    with_items:
+    - var: DISPLAY
+      val: ":0.0"
+    - var: LIBGL_ALWAYS_INDIRECT
+      val: 1
+    lineinfile:
+      dest: "{{ ansible_user_dir }}/.bashrc"
+      line: "export {{ item.var }}={{ item.val }}"
+      regexp: "^export\\s+{{ item.var }}="
+
+  - name: Kali Desktop Xfce
+    with_items:
+    - name: kali-desktop-xfce
+#    - name: xorg # not needed when using a Windows X-server like VcXsrv
+#    - name: xrdp
+    become: yes
+    apt:
+      name: "{{ item.name }}"
+      state: "{{ item.state | default('present') }}"
+
+#
+
+- name: SSH configuration
+  hosts: all:localhost
+  tasks:
+
+  - name: Copy the .ssh directory from Windows, if present
+    when: userprofile_ssh_result.stat.exists
+    copy:
+      src: "{{ userprofile }}/.ssh/"
+      dest: "{{ ansible_user_dir }}/.ssh/"
+      mode: 0600
+      force: yes
+
+  - name: Find public keys in the .ssh directory
+    find:
+      paths: "{{ ansible_user_dir }}/.ssh"
+      file_type: file
+      patterns: '*.pub'
+      contains: '^ssh'
+    register: public_key
+
+  - name: Set permissions on public keys
+    with_items: "{{ public_key.files }}"
+    file:
+      path: "{{ item.path }}"
+      mode: 0644
+
+  - name: .ssh/config
+    with_items:
+    - var: "VerifyHostKeyDNS" # SSHFP support
+      val: "yes"
+    become: no
+    lineinfile:
+      dest: "{{ ansible_user_dir }}/.ssh/config"
+      create: yes
+      line: "{{ item.var }} {{ item.val }}"
+      regexp: "^{{ item.var }}\\s+"
+
+#
+
+#
+# Requires Insider Build 17063
+# https://blogs.msdn.microsoft.com/commandline/2018/01/12/chmod-chown-wsl-improvements/
+#
+#- name: TEST MOUNT
+#  hosts: all:localhost
+#  tasks:
+#  - name: Unmount the C drive
+#    become: yes
+#    mount:
+#      path: "/mnt/c"
+#      state: unmounted
+#  - name: Remount the C drive
+#    become: yes
+#    command: "mount -t drvfs C: /mnt/c -o metadata"
+#
+
+#
+
+- name: Metasploit PostgreSQL database
+  hosts: all:localhost
+  tasks:
+
+  - name: Start PostgreSQL
+    become: yes
+    service:
+      name: postgresql
+      state: started
+
+  - name: Initialize the Metasploit database
+    become: yes
+    command: msfdb init
+    register: msfdb_init_result
+    changed_when: not 'already configured' in msfdb_init_result.stdout
+
+  - name: Stop PostgreSQL
+    become: yes
+    service:
+      name: postgresql
+      state: stopped
