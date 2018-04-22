@@ -1,0 +1,198 @@
+# file: ansible_vault_rekey.yaml
+#
+# Rekeys all files, which have been Ansible Vault encrypted using a given old_vault_id
+# to the given (new) vault_id, in the target inventory. Does not follow symbolic links.
+#
+# You must only specify the vault id label (and not the password file path) in the
+# old_vault_id and vault_id variables.
+#
+# The old_vault_id defaults to empty (no label), if not defined.
+#
+# The new vault_id must be specified and not empty. The idea is that you will no longer
+# be using unlabeled vault identities after rekeying, because they are ambiguous.
+#
+# The old_vault_id label may be the same as the new, as long as also the old password file
+# is available in the vault_identity_list, so that Ansible can decipher the files (if
+# the new password is different). For example, if you are changing the password without
+# changing the vault identity label, then you must have the current (old) password in
+# another file and make sure also that file is on the vault_identity_list, and Ansible
+# is configured to try all the identities.
+#
+#
+# Usage examples:
+#
+#
+# Rekeying unlabeled files to the vault id 'dev':
+#
+#    ansible-playbook -i hosts -e vault_id='dev' ansible_vault_rekey.yaml
+#
+#
+# Rekeying from vault id 'dev_17' to 'dev_18':
+#
+#    ansible-playbook -i hosts -e old_vault_id='dev_17' -e vault_id='dev_18' ansible_vault_rekey.yaml
+#
+#
+# Changing the password without changing the vault id:
+#
+#    ansible-playbook -i hosts -e old_vault_id='dev' -e vault_id='dev' ansible_vault_rekey.yaml
+#
+#
+# Alternatively, you can specify the vault_id variable in the target inventory
+# under group_vars/all/.
+#
+---
+
+- name: REKEY ANSIBLE VAULT ENCRYPTED FILES
+  hosts: all:localhost
+  gather_facts: no
+  run_once: yes
+  tasks:
+
+  - name: Check the target inventory
+    assert:
+      that:
+      - inventory_dir is defined
+      msg: "Please specify the target --inventory"
+
+  - name: Validate configuration
+    assert:
+      that:
+      - vault_id | default('') != ''
+      - new_vault_id is not defined # set dynamically by this playbook
+      msg: "Please configure vault_id for the target inventory"
+
+  - name: Find the new Ansible Vault identity password file
+    with_fileglob: "{{ lookup('env', 'HOME') }}/.vault_pass?{{ vault_id }}.txt"
+    local_action:
+      module: stat
+      path: "{{ item }}"
+    register: home_vault_pass_files
+
+  - name: Make sure there is exactly one password file per vault id
+    when: home_vault_pass_files.results | length != 1
+    fail:
+      msg: >-
+        Did not find a single password file:
+        {{ home_vault_pass_files.results | map(attribute='stat.path') | list }}
+
+  - name: Resolve the new vault identity
+    local_action:
+      module: set_fact
+      new_vault_id: "{{ (vault_id + '@') if vault_id | default('') != '' else ''
+                     }}{{ home_vault_pass_files.results[0].stat.path }}"
+
+  - name: Test that the new vault identity is working
+    local_action:
+      module: shell
+      chdir: "/"
+      _raw_params: >-
+        ansible-vault encrypt_string --vault-id {{ new_vault_id }} 'secret' --name 'test'
+    environment: # work around a bug that prevents ansible-vault working with vault_identity_list configured
+      ANSIBLE_CONFIG: "/etc/ansible/ansible.cfg"
+    register: vault_encryption_test
+    changed_when: no
+
+  - name: Check if the target inventory is a git repository
+    local_action:
+      module: stat
+      path: "{{ inventory_dir }}/.git/config"
+    register: inventory_dir_git_config
+
+  - name: If it is a git repository, it must have clean status
+    when: inventory_dir_git_config.stat.exists
+    local_action:
+      module: shell
+      chdir: "{{ inventory_dir }}"
+      _raw_params: git status --porcelain
+    register: inventory_dir_git_status
+    failed_when: inventory_dir_git_status.rc != 0 or
+                 inventory_dir_git_status.stdout != "" or
+                 inventory_dir_git_status.stderr != ""
+    changed_when: no
+
+  - name: Find Ansible Vault encrypted files in the target inventory
+    local_action:
+      module: shell
+      chdir: "/"
+      _raw_params: grep -rl '^$ANSIBLE_VAULT;[^;]\+;AES256{{
+                             (";" + old_vault_id) if (old_vault_id|default('') != '') else ''
+                             }}$' '{{ inventory_dir | mandatory }}'
+    register: vault_encrypted_files
+    changed_when: no
+    failed_when: vault_encrypted_files.rc not in [0, 1]
+
+  - name: Find symbolic links in the target inventory
+    local_action:
+      module: shell
+      chdir: "/"
+      _raw_params: find '{{ inventory_dir }}' -type l
+    register: symbolic_links
+    changed_when: no
+
+  - name: Report the number of files and links found
+    debug:
+      msg: >-
+        Found {{ vault_encrypted_files.stdout_lines | length }} vault encrypted files
+        and {{ symbolic_links.stdout_lines | length }} symbolic links.
+
+  - name: Make sure one or more encrypted files were found
+    when: vault_encrypted_files.stdout_lines | length < 1
+    fail:
+      msg: >-
+        The target inventory does not contain any files
+        encrypted with the vault id '{{ old_vault_id | default("") }}'.
+
+  - name: Make sure there are no symbolic links on the list of encrypted files
+    when: vault_encrypted_files.stdout_lines |
+          intersect(symbolic_links.stdout_lines) | length > 0
+    fail:
+      msg: >-
+        Detection of Ansible Vault encrypted files using grep
+        should not have returned symlinks (but did).
+
+  - name: Report the symbolic link targets (Only items highlighted as changed will be rekeyed.)
+    with_items: "{{ symbolic_links.stdout_lines }}"
+    loop_control:
+      label: "{{ item | regex_replace(inventory_dir + '/', '') }}"
+    debug:
+      msg: "links to -> {{ item | realpath }}"
+    changed_when: item | realpath in vault_encrypted_files.stdout_lines
+
+  - name: Examine the encrypted files (Paths without 'vault' are highlighted as changed.)
+    with_items: "{{ vault_encrypted_files.stdout_lines }}"
+    loop_control:
+      label: "{{ item | regex_replace(inventory_dir + '/', '') }}"
+    local_action:
+      module: stat
+      path: "{{ item }}"
+    register: vault_encrypted_files
+    changed_when: not item | search('vault')
+
+  - name: Vault encrypted file naming policy
+    when: vault_encrypted_files is changed
+    debug:
+      msg: >-
+        Please rename each file highlighted as 'changed' above,
+        adding the word 'vault' in the file name.
+    changed_when: yes
+
+  - name: Sanity-check the encrypted files
+    with_items: "{{ vault_encrypted_files.results | map(attribute='stat') | list }}"
+    loop_control:
+      label: "{{ item.path | regex_replace(inventory_dir + '/', '') }}"
+    when: item.size > 20480 # 20 KiB
+    fail:
+      msg: >-
+        Please do not use large (> 20 kiB) Ansible Vault encrypted files.
+        You are only supposed to encrypt secrets, not entire configuration files.
+
+  - name: Rekey Ansible Vault encrypted files
+    with_items: "{{ vault_encrypted_files.results | map(attribute='stat.path') | list }}"
+    local_action:
+      module: shell
+      _raw_params: >-
+       ansible-vault rekey --new-vault-id={{ new_vault_id }} {{ item }}
+    register: rekey_result
+    changed_when: rekey_result.rc == 0 and
+                  'successful' in rekey_result.stderr
+    failed_when: not 'successful' in rekey_result.stderr
