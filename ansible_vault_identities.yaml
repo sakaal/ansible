@@ -57,5 +57,6 @@
       option: "vault_identity_list"
       value: >-
        {% for path in home_vault_pass_files.results | map(attribute='stat.path') | list -%}
-       {{ path | regex_replace('.*\.vault_pass[_\.-](.*)\.txt', '\1@' + path ) }}
-       {% endfor %}
+       {{ path | regex_replace('.*\.vault_pass[_\.-](.*)\.txt', '\1@' + path )
+       }}{% if not loop.last %},{% endif
+       %}{% endfor %}
