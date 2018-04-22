@@ -1,0 +1,61 @@
+# file: ansible_vault_identities.yaml
+#
+# Configure one or more Ansible Vault identities for the current user.
+#
+---
+
+- name: ANSIBLE VAULT IDENTITIES
+  hosts: all:localhost
+  gather_facts: no
+  run_once: yes
+  tasks:
+
+  - name: Find Ansible Vault password files in the $HOME directory
+    with_fileglob:
+    - "{{ lookup('env', 'HOME') }}/.vault_pass*.txt"
+    local_action:
+      module: stat
+      path: "{{ item }}"
+    register: home_vault_pass_files
+
+  - name: Make sure one or more password files were found
+    when: home_vault_pass_files is skipped
+    fail:
+      msg: >-
+        Please specify each Ansible Vault password in a file named
+        {{ lookup('env', 'HOME') }}/.vault_pass-{vault_id}.txt
+        replacing {vault_id} with the corresponding vault id label.
+
+  - name: Sanity check the password files found
+    with_items: "{{ home_vault_pass_files.results | map(attribute='stat') | list }}"
+    loop_control:
+      label: "{{ item.path }}"
+    assert:
+      that:
+      - item.size > 16
+      - item.pw_name == lookup('env', 'USER')
+      - item.gr_name == lookup('env', 'USER')
+      msg: >-
+        Your Ansible Vault password file size must be > 16,
+        and the file must be owned by your user and group ({{ lookup('env', 'USER') }}).
+
+  - name: Enforce Ansible Vault password file permissions
+    with_items: "{{ home_vault_pass_files.results | map(attribute='stat') | list }}"
+    loop_control:
+      label: "{{ item.path }}"
+    local_action:
+      module: file
+      path: "{{ item.path }}"
+      mode: 0600
+
+  - name: Set the ansible_vault_identity_list in ~/.ansible.cfg
+    local_action:
+      module: ini_file
+      backup: no
+      dest: "{{ lookup('env', 'HOME') }}/.ansible.cfg"
+      section: "defaults"
+      option: "vault_identity_list"
+      value: >-
+       {% for path in home_vault_pass_files.results | map(attribute='stat.path') | list -%}
+       {{ path | regex_replace('.*\.vault_pass[_\.-](.*)\.txt', '\1@' + path ) }}
+       {% endfor %}
