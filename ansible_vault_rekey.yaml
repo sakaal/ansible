@@ -166,7 +166,7 @@
       module: stat
       path: "{{ item }}"
     register: vault_encrypted_files
-    changed_when: not item | search('vault')
+    changed_when: not item is search('vault')
 
   - name: Vault encrypted file naming policy
     when: vault_encrypted_files is changed
@@ -180,10 +180,11 @@
     with_items: "{{ vault_encrypted_files.results | map(attribute='stat') | list }}"
     loop_control:
       label: "{{ item.path | regex_replace(inventory_dir + '/', '') }}"
-    when: item.size > 20480 # 20 KiB
+    when: item.size > (vault_file_max_bytes | default(51200)) # default 50 kiB
     fail:
       msg: >-
-        Please do not use large (> 20 kiB) Ansible Vault encrypted files.
+        Please do not use large (> {{ vault_file_max_bytes | default(51200) / 1024 }} kiB)
+        Ansible Vault encrypted files.
         You are only supposed to encrypt secrets, not entire configuration files.
 
   - name: Rekey Ansible Vault encrypted files
