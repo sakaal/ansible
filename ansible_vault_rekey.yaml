@@ -86,7 +86,7 @@
       module: shell
       chdir: "/"
       _raw_params: >-
-        ansible-vault encrypt_string --vault-id {{ new_vault_id }} 'secret' --name 'test'
+        ansible-vault encrypt_string --vault-id {{ new_vault_id }} --encrypt-vault-id {{ vault_id }} 'secret' --name 'test'
     environment: # work around a bug that prevents ansible-vault working with vault_identity_list configured
       ANSIBLE_CONFIG: "/etc/ansible/ansible.cfg"
     register: vault_encryption_test
