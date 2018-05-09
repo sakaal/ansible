@@ -1,0 +1,15 @@
+{# file: roles/dropbox/templates/dropbox.service.j2
+#}
+[Unit]
+Description=Dropbox user daemon
+Requires=network-online.target
+After=network-online.target syslog.target
+
+[Service]
+Environment=LC_ALL=en_US.UTF-8
+Environment=LANG=en_US.UTF-8
+ExecStart={{ ansible_user_dir }}/.dropbox-dist/dropboxd
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

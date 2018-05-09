@@ -1,0 +1,59 @@
+# file: roles/dropbox/tasks/main.yaml
+---
+
+- name:	Search for a downloads directory
+  find:
+    paths: "{{ ansible_user_dir }}"
+    patterns: '(?i)Downloads?'
+    file_type: directory
+    use_regex: yes
+  register: dropbox_download
+
+- name: Resolve the downloads directory
+  set_fact:
+    download_dir: "{{ ansible_user_dir
+                   if (dropbox_download.matched != 1)
+                   else dropbox_download.files[0].path }}"
+
+- name: Download the Dropbox Headless archive
+  get_url:
+    url: "https://www.dropbox.com/download?plat=lnx.{{
+          ansible_userspace_architecture }}"
+    dest: "{{ download_dir }}"
+  register: dropbox_download
+
+- name: Unpack the Dropbox Headless archive
+  unarchive:
+    src: "{{ dropbox_download.dest }}"
+    dest: "{{ ansible_user_dir }}"
+
+- name: User-specific systemd configuration directory
+  when: ansible_service_mgr == "systemd"
+  file:
+    path: "{{ ansible_user_dir }}/.config/systemd/user"
+    state: directory
+    mode: 0755
+
+- name: User-specific systemd service unit file
+  when: ansible_service_mgr == "systemd"
+  template:
+    src: "dropbox.service.j2"
+    dest: "{{ ansible_user_dir }}/.config/systemd/user/dropbox.service"
+    mode: 0755
+  register: dropbox_unit
+
+- name: systemd user link network-online.target
+  when: dropbox_unit is changed
+  command:
+    creates: "{{ ansible_user_dir
+              }}/.config/systemd/user/network-online.target"
+    _raw_params: >-
+      systemctl --user link /usr/lib/systemd/system/network-online.target
+
+- name: systemd daemon-reload
+  when: dropbox_unit is changed
+  systemd:
+    user: yes
+    daemon_reload: yes
+    name: dropbox
+    state: restarted

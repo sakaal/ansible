@@ -1,0 +1,10 @@
+# file: dropbox_headless.yaml
+#
+# Dropbox Headless install for the ansible_user
+#
+---
+
+- hosts: localhost
+  connection: local
+  roles:
+  - dropbox
