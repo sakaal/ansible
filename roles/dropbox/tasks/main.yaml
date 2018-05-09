@@ -39,7 +39,7 @@
   template:
     src: "dropbox.service.j2"
     dest: "{{ ansible_user_dir }}/.config/systemd/user/dropbox.service"
-    mode: 0755
+    mode: 0644
   register: dropbox_unit
 
 - name: systemd user link network-online.target
