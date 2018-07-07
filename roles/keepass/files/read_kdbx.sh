@@ -17,7 +17,7 @@ echo "Reading entry '$keepass_entry' from file '$keepass_db'..."
 function read_entry {
     expect <<- EOF
 	set timeout 5
-	spawn kpcli
+	spawn kpcli --readonly
 	match_max 4096
 	expect "kpcli:/>"
 	send   "open '$(printf %q "$keepass_db")' '$(printf %q "$keepass_keyfile")'\n"
