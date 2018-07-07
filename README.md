@@ -30,9 +30,10 @@ Add the repository server host keys to `~/.ssh/known_hosts` and then run:
     ansible-playbook -v -i local working_copies.yaml
 
 If you keep your encrypted password database in Dropbox, like I do,
-read the `dropbox_headless.yaml` playbook. Then run it:
+read the `dropbox_headless.yaml` playbook. Run it as the local user
+which you want to link with your Dropbox account:
 
-    ansible-playbook -v -i local working_copies.yaml
+    ansible-playbook -v -i local dropbox_headless.yaml
 
 These are incomplete examples just to help you get started with Ansible.
 
