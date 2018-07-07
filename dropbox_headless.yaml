@@ -2,6 +2,8 @@
 #
 # Dropbox Headless install for the ansible_user
 #
+# Run this as the local user which you want to link with your Dropbox account.
+#
 # When you first install Dropbox Headless as a service
 # you will find a message like this in the service log:
 #
@@ -10,11 +12,11 @@
 #
 # Follow the instructions to link it.
 #
-# Check the service status like so:
+# You can check the service status like so:
 #
 #     systemctl --user status dropbox
 #
-# You can view the service log for example like so:
+# And view the service log for example like so:
 #
 #     journalctl --user-unit=dropbox --since "15m ago" --output=short-iso --no-hostname --no-pager
 #
