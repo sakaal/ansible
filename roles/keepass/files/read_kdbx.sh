@@ -3,7 +3,7 @@
 # INSECURE - THIS SCRIPT IS FOR TESTING PURPOSES ONLY.
 # DO NOT USE IN PRODUCTION.
 #
-config_file="~/.keepass/credentials"
+config_file=~/.keepass/credentials
 
 if [ -f "$config_file" ]; then
     . "$config_file"
