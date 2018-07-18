@@ -1,0 +1,44 @@
+# file: roles/common/defaults/main.yaml
+---
+
+common_packages:
+- bzip2
+- curl
+- gzip
+- p7zip
+- unzip
+- wget
+- bind-utils
+- expect
+- gdb
+- gnupg
+- htop
+- iotop
+- iptraf
+- java-1.8.0-openjdk
+- jwhois
+- kpcli
+- lftp
+- libselinux-python
+- lookup
+- lshw
+- lv
+- man
+- maven
+- mtr
+- nano
+- net-tools
+- parallel
+- pciutils
+- perl-Data-Password # kpcli
+- postgresql
+- procps
+- putty
+- pv
+- python-boto
+- python-setuptools
+- python-pip
+- screen
+- strace
+- sysstat
+- tcpdump
