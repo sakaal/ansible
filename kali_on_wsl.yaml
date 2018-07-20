@@ -155,13 +155,31 @@
       path: "{{ item.path }}"
       mode: 0644
 
-  - name: .ssh/config
+  - name: SSH user configuration directory
+    become: no
+    file:
+      state: directory
+      path: "{{ ansible_user_dir }}/.ssh/config.d"
+      mode: 0700
+
+  - name: Include files in the SSH user configuration directory
+    become: no
+    lineinfile:
+      path: "{{ ansible_user_dir }}/.ssh/config"
+      backup: yes
+      create: yes
+      insertbefore: BOF
+      regexp: '^Include\s+\config\.d/'
+      line: "Include config.d/*"
+      mode: 0600
+
+  - name: .ssh/config.d/default
     with_items:
     - var: "VerifyHostKeyDNS" # SSHFP support
       val: "yes"
     become: no
     lineinfile:
-      dest: "{{ ansible_user_dir }}/.ssh/config"
+      dest: "{{ ansible_user_dir }}/.ssh/config.d/default"
       create: yes
       line: "{{ item.var }} {{ item.val }}"
       regexp: "^{{ item.var }}\\s+"
