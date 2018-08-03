@@ -1,0 +1,31 @@
+# file: roles/virtual_machine/tasks/main.yaml
+---
+
+- name: VM packages (dnf)
+  when: ansible_pkg_mgr == "dnf"
+  with_items: "{{ virtual_machine_packages }}"
+  become: yes
+  dnf:
+    name: "{{ item }}"
+
+- name: VM packages (yum)
+  when: ansible_pkg_mgr == "yum"
+  with_items: "{{ virtual_machine_packages }}"
+  become: yes
+  yum:
+    name: "{{ item }}"
+
+- name: Detect if we are running in a VM
+  become: yes
+  command: virt-what
+  register: virtual_machine
+
+- name: Set the name of the hypervisor
+  set_fact:
+    hypervisor: "{{ virtual_machine.stdout_lines[0] }}"
+
+- name: Include variables for the hypervisor
+  include_vars: "{{ hypervisor }}.yaml"
+
+- name: Include VM configuration for the hypervisor
+  include_tasks: "{{ hypervisor }}.yaml"

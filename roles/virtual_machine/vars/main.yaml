@@ -1,0 +1,5 @@
+# file: roles/virtual_machine/vars/main.yaml
+---
+
+virtual_machine_packages:
+- "virt-what"

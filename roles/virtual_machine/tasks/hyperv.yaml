@@ -1,0 +1,60 @@
+# file: roles/virtual_machine/tasks/hyperv.yaml
+---
+
+- name: Let Hyper-V optimize disk I/O
+  with_dict: "{{ ansible_devices }}"
+  when: item.value.model == "Virtual Disk"
+  become: yes
+  shell:
+    _raw_params: echo noop > "/sys/block/{{ item.key }}/queue/scheduler"
+
+- name: Enable dynamic memory
+  become: yes
+  copy:
+    dest: "/etc/udev/rules.d/100-balloon.rules"
+    content: |
+      SUBSYSTEM=="memory", ACTION=="add", ATTR{state}="online"
+
+#
+# RHEA-2014:1439
+#
+
+- name: Hyper-V guest packages (yum)
+  when: ansible_pkg_mgr == "yum"
+  with_items: "{{ hyperv_guest_packages }}"
+  become: yes
+  yum:
+    name: "{{ item }}"
+
+- name: Hyper-V guest packages (dnf)
+  when: ansible_pkg_mgr == "dnf"
+  with_items: "{{ hyperv_guest_packages }}"
+  become: yes
+  dnf:
+    name: "{{ item }}"
+
+- name: Enable the Hyper-V services
+  with_items: "{{ hyperv_guest_services }}"
+  become: yes
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+
+- name: Check hypervfcopyd status
+  when: ('hypervfcopyd' in hyperv_guest_services)
+  command: systemctl status hypervfcopyd
+  register: hypervfcopyd_status
+  changed_when: hypervfcopyd_status.rc > 0
+
+- name: How to enable the Guest Service Interface
+  when: hypervfcopyd_status is changed
+  debug:
+    msg: >-
+      Please check if the 'Guest Service Interface'
+      integration service is enabled with the
+      following PowerShell command on the Hyper-V server:
+      Get-VMIntegrationService 'Guest Service Interface' -VMName {{ ansible_hostname }};
+      where '{{ ansible_hostname }}' is the name of the VM.
+      It can be enabled using the following PowerShell command:
+      Enable-VMIntegrationService 'Guest Service Interface' -VMName {{ ansible_hostname }};

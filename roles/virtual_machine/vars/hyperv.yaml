@@ -1,0 +1,10 @@
+# file: roles/virtual_machine/vars/hyperv.yaml
+---
+
+hyperv_guest_packages:
+- "hyperv-daemons"
+
+hyperv_guest_services:
+- "hypervkvpd"   # HV Key-Value Pair (KVP) daemon
+- "hypervvssd"   # HV VSS functionality
+- "hypervfcopyd" # HV file copy service functionality
