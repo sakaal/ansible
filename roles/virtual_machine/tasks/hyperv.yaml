@@ -3,10 +3,51 @@
 
 - name: Let Hyper-V optimize disk I/O
   with_dict: "{{ ansible_devices }}"
-  when: item.value.model == "Virtual Disk"
+  when: item.value.model == "Virtual Disk" and
+        item.value.scheduler_mode != "noop"
   become: yes
-  shell:
-    _raw_params: echo noop > "/sys/block/{{ item.key }}/queue/scheduler"
+  shell: echo noop > "/sys/block/{{ item.key }}/queue/scheduler"
+
+- name: Check the current GRUB_CMDLINE_LINUX
+  set_fact:
+    grub_cmdline_entries: "{{
+      lookup('ini',
+             'GRUB_CMDLINE_LINUX type=properties file=/etc/default/grub'
+             ).strip('\"').split() }}"
+
+- name: Check the current GRUB_CMDLINE_LINUX elevator argument
+  set_fact:
+    grub_cmdline_elevator: "{{ grub_cmdline_entries |
+                            select('match', 'elevator=.*') | list }}"
+
+- name: Set the current GRUB_CMDLINE_LINUX elevator argument
+  when: not 'elevator=noop' in grub_cmdline_elevator
+  become: yes
+  with_items:
+  - key: 'GRUB_CMDLINE_LINUX'
+    val: '"{{ grub_cmdline_entries | difference(grub_cmdline_elevator)
+          | join(" ") }} elevator=noop"'
+  lineinfile:
+    path: '/etc/default/grub'
+    regexp: '^{{ item.key }}=.*$'
+    line: '{{ item.key }}={{ item.val }}'
+  register: default_grub
+
+- name: Find the current grub configuration file
+  when: default_grub is changed
+  become: yes
+  find:
+    path: "/boot"
+    recurse: yes
+    patterns: "grub.cfg"
+    file_type: file
+  register: grub_config
+
+- name: Update the grub configuration
+  when: default_grub is changed and
+        grub_config.matched == 1
+  become: yes
+  command: grub2-mkconfig -o "{{ grub_config.files[0].path }}"
 
 - name: Enable dynamic memory
   become: yes

@@ -19,6 +19,7 @@
   become: yes
   command: virt-what
   register: virtual_machine
+  changed_when: no
 
 - name: Set the name of the hypervisor
   set_fact:
