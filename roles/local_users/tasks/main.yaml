@@ -43,3 +43,14 @@
     mode: 0660
     force: no
     backup: yes
+
+- name: Scripts in /usr/local/bin/
+  with_items:
+  - "git-pull-workspace"
+  copy:
+    src: "{{ item }}.sh"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: 0775
+    force: yes
